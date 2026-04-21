@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 9.2 - CI/CD Workflow Simulator</title>
+    <link rel="stylesheet" href="../../lab.css">
+    <style>
+        .pipeline-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            background: rgba(255,255,255,0.06);
+            padding: 2.2rem;
+            border-radius: 18px;
+        }
+        .node {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 2.5px solid #3f3f46;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.75rem;
+            transition: all 0.4s ease;
+        }
+        .node.done {
+            border-color: var(--success);
+            background: rgba(34,197,94,0.12);
+        }
+        .node.active {
+            border-color: var(--primary);
+            animation: growPulse 1s infinite;
+        }
+        @keyframes growPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-layout">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>Lab 9.2</h1>
+                <p>CI/CD Workflow</p>
+            </div>
+            <div class="glass-card">
+                <h3>Pipeline Control</h3>
+                <button class="btn" style="width:100%" onclick="triggerPipelineFlow()">
+                    Deploy to Main
+                </button>
+            </div>
+            <a href="../index.html" style="margin-top:auto; color: var(--primary); text-decoration: none; font-weight:600;">
+                ← Back
+            </a>
+        </aside>
+
+        <main class="main-content">
+            <div class="pipeline-wrapper">
+                <div class="node" id="step1">TEST</div>
+                <div style="font-size:2rem">➜</div>
+                <div class="node" id="step2">BUILD</div>
+                <div style="font-size:2rem">➜</div>
+                <div class="node" id="step3">DEPLOY</div>
+                <div style="font-size:2rem">➜</div>
+                <div class="node" id="step4">NOTIFY</div>
+            </div>
+
+            <div class="glass-card" style="margin-top:2rem;">
+                <h3>Execution Logs</h3>
+                <div class="console" id="logArea" style="height:250px">
+                    <div class="line">Awaiting pipeline trigger...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function triggerPipelineFlow() {
+            const logBox = document.getElementById('logArea');
+            logBox.innerHTML += `<div>[Trigger] Code pushed to 'main' branch</div>`;
+
+            const pipelineSteps = [
+                {id: 'step1', msg: 'Unit tests executed successfully'},
+                {id: 'step2', msg: 'Docker image build complete'},
+                {id: 'step3', msg: 'Deployment to registry done'},
+                {id: 'step4', msg: 'Notification sent to team'}
+            ];
+
+            let index = 0;
+
+            const executeStep = () => {
+                if (index >= pipelineSteps.length) return;
+
+                const currentNode = document.getElementById(pipelineSteps[index].id);
+                currentNode.className = 'node active';
+
+                setTimeout(() => {
+                    currentNode.className = 'node done';
+                    logBox.innerHTML += `<div>${pipelineSteps[index].msg}</div>`;
+                    index++;
+                    executeStep();
+                }, 1100);
+            };
+
+            executeStep();
+        }
+    </script>
+</body>
+</html>
