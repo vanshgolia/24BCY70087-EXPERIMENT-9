@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 9.3 - Cloud Infrastructure Simulator</title>
+    <link rel="stylesheet" href="../../lab.css">
+    <style>
+        .cloud-panel {
+            background: #1f2937;
+            padding: 1.6rem;
+            border-radius: 14px;
+            color: #fff;
+        }
+        .instances {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            margin-top: 2rem;
+        }
+        .instance-card {
+            background: rgba(255,255,255,0.08);
+            padding: 1.1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.18);
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.55rem;
+            border-radius: 5px;
+            background: #22c55e;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-layout">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>Lab 9.3</h1>
+                <p>Cloud Scaling Demo</p>
+            </div>
+            <div class="glass-card">
+                <h3>Scaling Control</h3>
+                <button class="btn" style="width:100%" onclick="scaleInfrastructure()">
+                    Increase Capacity
+                </button>
+            </div>
+            <a href="../index.html" style="margin-top:auto; color: var(--primary); text-decoration: none; font-weight:600;">
+                ← Back
+            </a>
+        </aside>
+
+        <main class="main-content">
+            <div class="cloud-panel">
+                <h2>Container Service Cluster</h2>
+                <p>Status: <span class="badge">Healthy</span></p>
+
+                <div class="instances" id="instanceContainer">
+                    <div class="instance-card">
+                        Instance (ID: srv-a1b2)<br>
+                        <span class="badge">Running</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top:2rem;">
+                <h3>Infrastructure Config</h3>
+                <pre style="background:#000; padding:1.5rem; border-radius:12px; color:#facc15; font-family:monospace; overflow-x:auto;">
+resource "aws_autoscaling_group" "web_asg" {
+  desired_capacity = 2
+  max_size         = 5
+  min_size         = 1
+  vpc_zone_identifier = [aws_subnet.main.id]
+}</pre>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let instanceCount = 1;
+
+        function scaleInfrastructure() {
+            if (instanceCount >= 6) return;
+
+            instanceCount++;
+            const container = document.getElementById('instanceContainer');
+
+            const newInstance = document.createElement('div');
+            newInstance.className = 'instance-card';
+
+            const id = Math.random().toString(36).substring(2, 6);
+
+            newInstance.innerHTML = `
+                Instance (ID: srv-${id})<br>
+                <span class="badge" style="background:#6366f1">Starting...</span>
+            `;
+
+            container.appendChild(newInstance);
+
+            setTimeout(() => {
+                const badge = newInstance.querySelector('.badge');
+                badge.style.background = '#22c55e';
+                badge.innerText = 'Running';
+            }, 1400);
+        }
+    </script>
+</body>
+</html>
