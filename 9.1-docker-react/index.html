@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 9.1 - Docker React Simulation</title>
+    <link rel="stylesheet" href="../../lab.css">
+    <style>
+        .pipeline-box {
+            border: 2px dotted var(--primary);
+            padding: 2.2rem;
+            border-radius: 18px;
+            background: rgba(0,0,0,0.45);
+            text-align: center;
+        }
+        .phase {
+            display: inline-block;
+            padding: 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 0.8rem;
+            opacity: 0.35;
+            transition: all 0.4s ease;
+        }
+        .phase.active {
+            opacity: 1;
+            border-color: var(--primary);
+            transform: scale(1.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-layout">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>Lab 9.1</h1>
+                <p>Docker Build Simulation</p>
+            </div>
+            <div class="glass-card">
+                <h3>Controls</h3>
+                <button class="btn" style="width:100%; margin-bottom:1rem" onclick="startBuildProcess()">
+                    Start Build
+                </button>
+                <div id="statusText" style="font-size:0.85rem; color:var(--success)">
+                    Waiting to start...
+                </div>
+            </div>
+            <a href="../index.html" style="margin-top:auto; color: var(--primary); text-decoration: none; font-weight:600;">
+                ← Back
+            </a>
+        </aside>
+
+        <main class="main-content">
+            <div class="pipeline-box">
+                <h2>Docker Build Stages</h2>
+
+                <div class="phase" id="stageBuild">
+                    BUILD STAGE<br>(node:18-alpine)
+                </div>
+
+                <div class="phase" id="stageProd">
+                    PRODUCTION STAGE<br>(nginx:alpine)
+                </div>
+
+                <div id="consoleOutput" class="console" style="margin-top:2rem; text-align:left;">
+                    <div class="line">$ docker build -t react-prod-app .</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function startBuildProcess() {
+            const output = document.getElementById('consoleOutput');
+            const buildStage = document.getElementById('stageBuild');
+            const prodStage = document.getElementById('stageProd');
+            const status = document.getElementById('statusText');
+
+            output.innerHTML += `<div>Step 1/6: Pulling node:18-alpine...</div>`;
+            buildStage.classList.add('active');
+
+            setTimeout(() => {
+                output.innerHTML += `<div>Step 3/6: Installing dependencies...</div>`;
+
+                setTimeout(() => {
+                    output.innerHTML += `<div>Step 5/6: Switching to nginx:alpine...</div>`;
+                    buildStage.classList.remove('active');
+                    prodStage.classList.add('active');
+
+                    setTimeout(() => {
+                        output.innerHTML += `<div style="color:var(--success)">Build completed successfully (size: 25MB)</div>`;
+                        status.innerText = "Build Completed!";
+                    }, 1000);
+
+                }, 1000);
+
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
